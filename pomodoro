@@ -1,0 +1,63 @@
+#!/bin/sh
+prg="${0##*/}"
+
+usage()
+{
+    printf '%s\n' "Usage: ${prg}: [options] number" 1>&2
+    exit 0
+}
+
+version()
+{
+    printf '%s\n' "${prg}: 0.1.0" 1>&2
+    exit 0
+}
+
+err()
+{
+    case "$1" in
+        1) msg="$prg: bad argument list" ;;
+        2) msg="$prg: invalid option -- '$OPTARG'" ;;
+        3) msg="$prg: option requires an argument -- '$OPTARG'" ;;
+        4) msg="$prg: invalid option argument --'$OPTARG'" ;;
+    esac
+    printf "%s\nTry '%s -h' for more information.\n" "$msg" "$prg" 1>&2
+    exit "$1"
+}
+
+is_uint()
+{
+    case "$1" in
+        '' | *[!0-9]*) return 1 ;;
+    esac
+}
+
+notify()
+{
+    printf '%s\n' "$1" 1>&2
+}
+
+session()
+{
+    sleep eval "$(($1 * 60))"
+    notify "Break"
+}
+
+main()
+{
+    while getopts ':hv' i
+    do
+        case "$i" in
+            h) usage ;;
+            v) version ;;
+           \?) err 2 ;;
+            :) err 3 ;;
+        esac
+        shift $((OPTIND - 1))
+    done
+    [ "$*" ] && is_uint "$1" || err 1   #this is NOT a if-then-else command
+    session "$1"
+    exit 0
+}
+
+main "$@"
