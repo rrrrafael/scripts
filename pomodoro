@@ -39,7 +39,7 @@ notify()
 
 session()
 {
-    sleep eval "$(($1 * 60))"
+    sleep "$(($1 * 60))"
     notify "Break"
 }
 
